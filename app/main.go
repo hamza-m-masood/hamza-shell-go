@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strings"
 )
 
@@ -24,8 +25,11 @@ func main() {
 			fmt.Fprintln(os.Stderr, "Error reading input", err)
 			os.Exit(1)
 		}
+		// to remove the carriage return at the end
 		command = strings.TrimSpace(command)
+		// to get every space separated word (also known as a token) and return a slice of all the words entered
 		tokens := strings.Fields(command)
+		builtin := []string{"exit", "echo", "type"}
 		switch tokens[0] {
 		case "exit":
 			if len(tokens) > 1 {
@@ -35,6 +39,14 @@ func main() {
 			return
 		case "echo":
 			fmt.Println(strings.Join(tokens[1:], " "))
+		case "type":
+			for i := 1; i < len(tokens); i++ {
+				if slices.Contains(builtin, tokens[i]) {
+					fmt.Printf("%v is a shell builtin\n", tokens[i])
+				} else {
+					fmt.Println("invalid_command: not found")
+				}
+			}
 		default:
 			fmt.Println(command + ": command not found")
 		}
