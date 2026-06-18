@@ -26,11 +26,12 @@ func main() {
 		}
 		command = strings.TrimSpace(command)
 		tokens := strings.Fields(command)
-		if command == "exit" {
-			break
-		} else if tokens[0] == "echo" {
+		switch tokens[0] {
+		case "exit":
+			return
+		case "echo":
 			fmt.Println(strings.Join(tokens[1:], " "))
-		} else {
+		default:
 			fmt.Println(command + ": command not found")
 		}
 	}
