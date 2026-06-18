@@ -28,6 +28,10 @@ func main() {
 		tokens := strings.Fields(command)
 		switch tokens[0] {
 		case "exit":
+			if len(tokens) > 1 {
+				fmt.Fprintln(os.Stderr, "exit: too many arguments")
+				continue
+			}
 			return
 		case "echo":
 			fmt.Println(strings.Join(tokens[1:], " "))
