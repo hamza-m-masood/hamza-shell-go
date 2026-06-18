@@ -45,7 +45,7 @@ func main() {
 				if slices.Contains(builtin, tokens[i]) {
 					fmt.Printf("%v is a shell builtin\n", tokens[i])
 				} else {
-					pathDirs := strings.Split(os.Getenv("PATHS"), ":")
+					pathDirs := strings.Split(os.Getenv("PATH"), ":")
 					for _, dir := range pathDirs {
 						files, err := os.ReadDir(dir)
 						if err != nil {
