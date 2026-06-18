@@ -32,7 +32,7 @@ func main() {
 			for i := 1; i < len(tokens); i++ {
 				fmt.Print(tokens[i])
 				if i != len(tokens)-1 {
-					fmt.Print(", ")
+					fmt.Print(" ")
 				}
 				if i == len(tokens)-1 {
 					fmt.Println()
