@@ -44,7 +44,7 @@ func main() {
 				if slices.Contains(builtin, tokens[i]) {
 					fmt.Printf("%v is a shell builtin\n", tokens[i])
 				} else {
-					fmt.Printf("%v: command not found", tokens[i])
+					fmt.Println(tokens[i] + ": command not found")
 				}
 			}
 		default:
