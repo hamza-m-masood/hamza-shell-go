@@ -25,9 +25,22 @@ func main() {
 			os.Exit(1)
 		}
 		command = strings.TrimSpace(command)
+		tokens := strings.Split(command, " ")
 		if command == "exit" {
 			break
+		} else if tokens[0] == "echo" {
+			for i := 1; i < len(tokens); i++ {
+				fmt.Print(tokens[i])
+				if i != len(tokens)-1 {
+					fmt.Print(", ")
+				}
+				if i == len(tokens)-1 {
+					fmt.Println()
+				}
+			}
+		} else {
+
+			fmt.Println(command + ": command not found")
 		}
-		fmt.Println(command + ": command not found")
 	}
 }
