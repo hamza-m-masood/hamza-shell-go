@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 )
@@ -44,6 +45,27 @@ func main() {
 				if slices.Contains(builtin, tokens[i]) {
 					fmt.Printf("%v is a shell builtin\n", tokens[i])
 				} else {
+					pathDirs := strings.Split(os.Getenv("PATHS"), ":")
+					for _, dir := range pathDirs {
+						files, err := os.ReadDir(dir)
+						if err != nil {
+							fmt.Printf("error reading path %v: %v", dir, err)
+						}
+						for _, file := range files {
+							fullPath := filepath.Join(dir, file.Name())
+							fileInfo, err := os.Lstat(fullPath)
+							if err != nil {
+								fmt.Printf("error getting file info %v: %v", fullPath, err)
+							}
+							if !fileInfo.IsDir() {
+								permission := fileInfo.Mode().Perm()
+								if permission&0o111 != 0 && file.Name() == tokens[i] {
+									fmt.Printf("%v is %v\n", tokens[i], fullPath)
+								}
+
+							}
+						}
+					}
 					fmt.Println(tokens[i] + ": not found")
 				}
 			}
