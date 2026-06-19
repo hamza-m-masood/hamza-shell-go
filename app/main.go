@@ -2,8 +2,10 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"slices"
@@ -45,10 +47,14 @@ func main() {
 				if slices.Contains(builtin, tokens[i]) {
 					fmt.Printf("%v is a shell builtin\n", tokens[i])
 				} else {
+					fileFound := false
 					pathDirs := strings.Split(os.Getenv("PATH"), ":")
 					for _, dir := range pathDirs {
 						files, err := os.ReadDir(dir)
 						if err != nil {
+							if errors.Is(err, fs.ErrNotExist) {
+								continue
+							}
 							fmt.Printf("error reading path %v: %v", dir, err)
 						}
 						for _, file := range files {
@@ -61,12 +67,18 @@ func main() {
 								permission := fileInfo.Mode().Perm()
 								if permission&0o111 != 0 && file.Name() == tokens[i] {
 									fmt.Printf("%v is %v\n", tokens[i], fullPath)
+									fileFound = true
+									break
 								}
-
 							}
 						}
+						if fileFound {
+							break
+						}
 					}
-					fmt.Println(tokens[i] + ": not found")
+					if !fileFound {
+						fmt.Println(tokens[i] + ": not found")
+					}
 				}
 			}
 		default:
