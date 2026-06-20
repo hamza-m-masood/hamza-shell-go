@@ -45,38 +45,6 @@ func main() {
 				if slices.Contains(builtin, tokens[i]) {
 					fmt.Printf("%v is a shell builtin\n", tokens[i])
 				} else {
-					// fileFound := false
-					// pathDirs := strings.Split(os.Getenv("PATH"), ":")
-					// for _, dir := range pathDirs {
-					// 	files, err := os.ReadDir(dir)
-					// 	if err != nil {
-					// 		if errors.Is(err, fs.ErrNotExist) {
-					// 			continue
-					// 		}
-					// 		fmt.Printf("error reading path %v: %v", dir, err)
-					// 	}
-					// 	for _, file := range files {
-					// 		fullPath := filepath.Join(dir, file.Name())
-					// 		fileInfo, err := os.Lstat(fullPath)
-					// 		if err != nil {
-					// 			fmt.Printf("error getting file info %v: %v", fullPath, err)
-					// 		}
-					// 		if !fileInfo.IsDir() {
-					// 			permission := fileInfo.Mode().Perm()
-					// 			if permission&0o111 != 0 && file.Name() == tokens[i] {
-					// 				fmt.Printf("%v is %v\n", tokens[i], fullPath)
-					// 				fileFound = true
-					// 				break
-					// 			}
-					// 		}
-					// 	}
-					// 	if fileFound {
-					// 		break
-					// 	}
-					// }
-					// if !fileFound {
-					// 	fmt.Println(tokens[i] + ": not found")
-					// }
 					path, err := exec.LookPath(tokens[i])
 					if err != nil {
 						fmt.Println(tokens[i] + ": not found")
