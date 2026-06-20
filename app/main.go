@@ -2,8 +2,10 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"os/exec"
 	"slices"
@@ -29,7 +31,7 @@ func main() {
 		command = strings.TrimSpace(command)
 		// to get every space separated word (also known as a token) and return a slice of all the words entered
 		tokens := strings.Fields(command)
-		builtin := []string{"exit", "echo", "type", "pwd"}
+		builtin := []string{"exit", "echo", "type", "pwd", "cd"}
 		switch tokens[0] {
 		case "exit":
 			if len(tokens) > 1 {
@@ -58,6 +60,16 @@ func main() {
 					}
 				}
 			}
+		case "cd":
+			err := os.Chdir(tokens[1])
+			if err != nil {
+				if errors.Is(err, os.ErrNotExist) {
+					fmt.Printf("%v: %v\n", tokens[1], fs.ErrNotExist)
+				} else {
+					fmt.Println("error changing directory: %v\n", err)
+				}
+			}
+
 		default:
 			_, err := exec.LookPath(tokens[0])
 			if err != nil {
