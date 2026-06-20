@@ -60,7 +60,17 @@ func main() {
 				}
 			}
 		case "cd":
-			err := os.Chdir(tokens[1])
+			var err error
+			if tokens[1] == "~" {
+				homeDir, err := os.UserHomeDir()
+				if err != nil {
+					fmt.Printf("error geting home directory of user: %v", err)
+				}
+				err = os.Chdir(homeDir)
+			} else {
+
+				err = os.Chdir(tokens[1])
+			}
 			if err != nil {
 				if errors.Is(err, os.ErrNotExist) {
 					fmt.Printf("cd: %v: No such file or directory\n", tokens[1])
