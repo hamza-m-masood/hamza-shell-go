@@ -79,7 +79,7 @@ func main() {
 					// }
 					path, err := exec.LookPath(tokens[i])
 					if err != nil {
-						fmt.Println(tokens[i] + ": command not found")
+						fmt.Println(tokens[i] + ": not found")
 					} else {
 						fmt.Printf("%v is %v\n", tokens[i], path)
 					}
