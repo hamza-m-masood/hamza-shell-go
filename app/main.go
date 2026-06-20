@@ -29,7 +29,7 @@ func main() {
 		command = strings.TrimSpace(command)
 		// to get every space separated word (also known as a token) and return a slice of all the words entered
 		tokens := strings.Fields(command)
-		builtin := []string{"exit", "echo", "type"}
+		builtin := []string{"exit", "echo", "type", "pwd"}
 		switch tokens[0] {
 		case "exit":
 			if len(tokens) > 1 {
@@ -39,6 +39,12 @@ func main() {
 			return
 		case "echo":
 			fmt.Println(strings.Join(tokens[1:], " "))
+		case "pwd":
+			wd, err := os.Getwd()
+			if err != nil {
+				fmt.Println("Couldn't get current working directory: %v", err)
+			}
+			fmt.Printf("%v\n", wd)
 		case "type":
 			for i := 1; i < len(tokens); i++ {
 				if slices.Contains(builtin, tokens[i]) {
