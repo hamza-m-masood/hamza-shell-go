@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"os"
 	"os/exec"
 	"slices"
@@ -64,7 +63,7 @@ func main() {
 			err := os.Chdir(tokens[1])
 			if err != nil {
 				if errors.Is(err, os.ErrNotExist) {
-					fmt.Printf("%v: %v\n", tokens[1], fs.ErrNotExist)
+					fmt.Printf("cd: %v: No such file or directory\n", tokens[1])
 				} else {
 					fmt.Println("error changing directory: %v\n", err)
 				}
