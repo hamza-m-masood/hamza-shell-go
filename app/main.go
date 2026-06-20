@@ -53,7 +53,18 @@ func main() {
 				}
 			}
 		default:
-			fmt.Println(command + ": command not found")
+			_, err := exec.LookPath(tokens[0])
+			if err != nil {
+				fmt.Println(tokens[0] + ": not found")
+			} else {
+				cmd := exec.Command(tokens[0], tokens[1:]...)
+				// cmd.Stdin = os.Stdin
+				cmd.Stdout = os.Stdout
+				err := cmd.Run()
+				if err != nil {
+					fmt.Printf("couldn't run command: %v: %v", tokens[0], err)
+				}
+			}
 		}
 	}
 }
