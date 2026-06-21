@@ -22,6 +22,7 @@ func tokenize(command string) []string {
 		if escape {
 			current.WriteRune(ch)
 			escape = false
+			continue
 		}
 		switch {
 		// handling for single and double quotes
