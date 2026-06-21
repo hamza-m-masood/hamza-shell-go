@@ -58,14 +58,13 @@ func tokenize(command string) []string {
 				escape = false
 			}
 		// handling for '\' when not in quotes
-		case ch == '\\' && !inDoubleQuote && !inSingleQuote:
+		case ch == '\\':
 			if escape {
 				current.WriteRune(ch)
 				escape = false
 			} else {
 				escape = true
 			}
-			continue
 
 		default:
 			current.WriteRune(ch)
