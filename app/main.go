@@ -23,19 +23,36 @@ func tokenize(command string) []string {
 		// handling for single and double quotes
 		case ch == '\'' && !inSingleQuote && !inDoubleQuote:
 			inSingleQuote = true
+			if escape {
+				tokens = append(tokens, current.String())
+				escape = false
+			}
 		case ch == '\'' && inSingleQuote:
 			inSingleQuote = false
+			if escape {
+				tokens = append(tokens, current.String())
+				escape = false
+			}
+		case ch == '"' && !inDoubleQuote && !inSingleQuote:
+			inDoubleQuote = true
+			if escape {
+				tokens = append(tokens, current.String())
+				escape = false
+			}
+		case ch == '"' && inDoubleQuote:
+			inDoubleQuote = false
+			if escape {
+				tokens = append(tokens, current.String())
+				escape = false
+			}
 		case ch == ' ' && !inSingleQuote && !inDoubleQuote:
 			if current.Len() > 0 {
 				tokens = append(tokens, current.String())
 				current.Reset()
 			} else if escape {
 				tokens = append(tokens, current.String())
+				escape = false
 			}
-		case ch == '"' && !inDoubleQuote && !inSingleQuote:
-			inDoubleQuote = true
-		case ch == '"' && inDoubleQuote:
-			inDoubleQuote = false
 		// handling for '\' when not in quotes
 		case ch == '\\' && !inDoubleQuote && !inSingleQuote:
 			escape = true
