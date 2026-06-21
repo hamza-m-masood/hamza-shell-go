@@ -102,7 +102,16 @@ func main() {
 		case "echo":
 			fmt.Println(strings.Join(tokens[1:], " "))
 		case "cat":
-			fmt.Println(strings.Join(tokens[1:], " "))
+			files := tokens[1:]
+			content := []string{}
+			for _, file := range files {
+				contentBytes, err := os.ReadFile(file)
+				if err != nil {
+					fmt.Printf("error reading file: %v: %v\n", file, err)
+				}
+				content = append(content, strings.TrimSpace(string(contentBytes)))
+			}
+			fmt.Println(strings.Join(content, " "))
 		case "pwd":
 			wd, err := os.Getwd()
 			if err != nil {
@@ -131,7 +140,6 @@ func main() {
 				}
 				err = os.Chdir(homeDir)
 			} else {
-
 				err = os.Chdir(tokens[1])
 			}
 			if err != nil {
@@ -141,7 +149,6 @@ func main() {
 					fmt.Println("error changing directory: %v\n", err)
 				}
 			}
-
 		default:
 			_, err := exec.LookPath(tokens[0])
 			if err != nil {
