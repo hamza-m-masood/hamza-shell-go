@@ -11,6 +11,34 @@ import (
 	"strings"
 )
 
+func tokenize(command string) []string {
+	var tokens []string
+	var current strings.Builder
+	inSingleQuote := false
+
+	for _, ch := range command {
+		switch {
+		case ch == '\'' && !inSingleQuote:
+			inSingleQuote = true
+		case ch == '\'' && inSingleQuote:
+			inSingleQuote = false
+		case ch == ' ' && !inSingleQuote:
+			if current.Len() > 0 {
+				tokens = append(tokens, current.String())
+				current.Reset()
+			}
+		default:
+			current.WriteRune(ch)
+		}
+	}
+
+	if current.Len() > 0 {
+		tokens = append(tokens, current.String())
+	}
+
+	return tokens
+}
+
 var _ = fmt.Print
 
 func main() {
@@ -26,10 +54,8 @@ func main() {
 			fmt.Fprintln(os.Stderr, "Error reading input", err)
 			os.Exit(1)
 		}
-		// to remove the carriage return at the end
 		command = strings.TrimSpace(command)
-		// to get every space separated word (also known as a token) and return a slice of all the words entered
-		tokens := strings.Fields(command)
+		tokens := tokenize(command)
 		builtin := []string{"exit", "echo", "type", "pwd", "cd"}
 		switch tokens[0] {
 		case "exit":
@@ -39,20 +65,7 @@ func main() {
 			}
 			return
 		case "echo":
-			var parsedTokens []string
-			args := tokens[1:]
-			// for _, arg := range args {
-			for i := 0; i < len(args); i++ {
-				if args[i][:1] == "'" && args[i][len(args[i])-1:len(args[i])] == "'" {
-					arg := strings.ReplaceAll(args[i], "'", "")
-					args = slices.Replace(args, i, i+1, arg)
-					fmt.Println("this is test:", arg)
-					parsedTokens = append(parsedTokens, arg)
-				} else {
-					parsedTokens = append(parsedTokens, args[i])
-				}
-			}
-			fmt.Println(strings.Join(args, " "))
+			fmt.Println(strings.Join(tokens[1:], " "))
 		case "pwd":
 			wd, err := os.Getwd()
 			if err != nil {
