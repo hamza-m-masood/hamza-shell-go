@@ -19,7 +19,7 @@ func tokenize(command string) []string {
 
 	for _, ch := range command {
 		switch {
-		case ch == '\'' && !inSingleQuote:
+		case ch == '\'' && !inSingleQuote && !inDoubleQuote:
 			inSingleQuote = true
 		case ch == '\'' && inSingleQuote:
 			inSingleQuote = false
@@ -28,7 +28,7 @@ func tokenize(command string) []string {
 				tokens = append(tokens, current.String())
 				current.Reset()
 			}
-		case ch == '"' && !inDoubleQuote:
+		case ch == '"' && !inDoubleQuote && !inSingleQuote:
 			inDoubleQuote = true
 		case ch == '"' && inDoubleQuote:
 			inDoubleQuote = false
