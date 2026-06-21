@@ -15,6 +15,7 @@ func tokenize(command string) []string {
 	var tokens []string
 	var current strings.Builder
 	inSingleQuote := false
+	inDoubleQuote := false
 
 	for _, ch := range command {
 		switch {
@@ -23,6 +24,15 @@ func tokenize(command string) []string {
 		case ch == '\'' && inSingleQuote:
 			inSingleQuote = false
 		case ch == ' ' && !inSingleQuote:
+			if current.Len() > 0 {
+				tokens = append(tokens, current.String())
+				current.Reset()
+			}
+		case ch == '"' && !inDoubleQuote:
+			inDoubleQuote = true
+		case ch == '"' && inDoubleQuote:
+			inDoubleQuote = false
+		case ch == ' ' && !inDoubleQuote:
 			if current.Len() > 0 {
 				tokens = append(tokens, current.String())
 				current.Reset()
