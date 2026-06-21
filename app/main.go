@@ -16,9 +16,11 @@ func tokenize(command string) []string {
 	var current strings.Builder
 	inSingleQuote := false
 	inDoubleQuote := false
+	escape := false
 
 	for _, ch := range command {
 		switch {
+		// handling for single and double quotes
 		case ch == '\'' && !inSingleQuote && !inDoubleQuote:
 			inSingleQuote = true
 		case ch == '\'' && inSingleQuote:
@@ -27,11 +29,18 @@ func tokenize(command string) []string {
 			if current.Len() > 0 {
 				tokens = append(tokens, current.String())
 				current.Reset()
+			} else if escape {
+				tokens = append(tokens, current.String())
 			}
 		case ch == '"' && !inDoubleQuote && !inSingleQuote:
 			inDoubleQuote = true
 		case ch == '"' && inDoubleQuote:
 			inDoubleQuote = false
+		// handling for '\' when not in quotes
+		case ch == '\\' && !inDoubleQuote && !inSingleQuote:
+			escape = true
+			continue
+
 		default:
 			current.WriteRune(ch)
 		}
