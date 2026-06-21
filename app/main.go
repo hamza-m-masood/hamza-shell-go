@@ -91,7 +91,7 @@ func main() {
 		}
 		command = strings.TrimSpace(command)
 		tokens := tokenize(command)
-		builtin := []string{"exit", "echo", "type", "pwd", "cd"}
+		builtin := []string{"exit", "echo", "type", "pwd", "cd", "cat"}
 		switch tokens[0] {
 		case "exit":
 			if len(tokens) > 1 {
@@ -100,6 +100,8 @@ func main() {
 			}
 			return
 		case "echo":
+			fmt.Println(strings.Join(tokens[1:], " "))
+		case "cat":
 			fmt.Println(strings.Join(tokens[1:], " "))
 		case "pwd":
 			wd, err := os.Getwd()
