@@ -36,12 +36,12 @@ func tokenize(command string) []string {
 		case ch == ' ' && !inSingleQuote && !inDoubleQuote:
 			tokens = append(tokens, current.String())
 			current.Reset()
-		case ch == '\\' && !inDoubleQuote && !inSingleQuote:
+		case ch == '\\':
+			fmt.Println("character:", ch, "escpaing!")
 			escape = true
 
 		default:
 			current.WriteRune(ch)
-			escape = false
 		}
 	}
 
