@@ -39,7 +39,20 @@ func main() {
 			}
 			return
 		case "echo":
-			fmt.Println(strings.Join(tokens[1:], " "))
+			var parsedTokens []string
+			args := tokens[1:]
+			// for _, arg := range args {
+			for i := 0; i < len(args); i++ {
+				if args[i][:1] == "'" && args[i][len(args[i])-1:len(args[i])] == "'" {
+					arg := strings.ReplaceAll(args[i], "'", "")
+					args = slices.Replace(args, i, i+1, arg)
+					fmt.Println("this is test:", arg)
+					parsedTokens = append(parsedTokens, arg)
+				} else {
+					parsedTokens = append(parsedTokens, args[i])
+				}
+			}
+			fmt.Println(strings.Join(args, " "))
 		case "pwd":
 			wd, err := os.Getwd()
 			if err != nil {
