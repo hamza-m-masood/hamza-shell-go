@@ -109,10 +109,8 @@ func main() {
 			fmt.Println(strings.Join(tokens[1:], " "))
 		case "cat":
 			files := tokens[1:]
-			fmt.Println("token zero:", tokens[1])
 			content := []string{}
 			for _, file := range files {
-				fmt.Println("file:", file)
 				contentBytes, err := os.ReadFile(file)
 				if err != nil {
 					fmt.Printf("error reading file: %v: %v\n", file, err)
