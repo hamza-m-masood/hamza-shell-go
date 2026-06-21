@@ -117,7 +117,7 @@ func main() {
 				}
 				content = append(content, strings.TrimSpace(string(contentBytes)))
 			}
-			fmt.Println(strings.Join(content, " "))
+			fmt.Println(strings.Join(content, ""))
 		case "pwd":
 			wd, err := os.Getwd()
 			if err != nil {
