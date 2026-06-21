@@ -37,7 +37,7 @@ func tokenize(command string) []string {
 		case ch == ' ' && !inSingleQuote && !inDoubleQuote:
 			tokens = append(tokens, current.String())
 			current.Reset()
-		case ch == '\\':
+		case ch == '\\' && !inSingleQuote:
 			escape = true
 
 		default:
