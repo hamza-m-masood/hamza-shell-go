@@ -50,11 +50,9 @@ func tokenize(command string) []string {
 				inDoubleQuote = false
 			}
 		case ch == ' ' && !inSingleQuote && !inDoubleQuote:
-			if current.Len() > 0 {
-				if !escape {
-					tokens = append(tokens, current.String())
-					current.Reset()
-				}
+			if current.Len() > 0 && !escape {
+				tokens = append(tokens, current.String())
+				current.Reset()
 			} else if escape {
 				current.WriteRune(ch)
 				escape = false
