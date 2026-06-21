@@ -19,52 +19,25 @@ func tokenize(command string) []string {
 	escape := false
 
 	for _, ch := range command {
+		if escape {
+			current.WriteRune(ch)
+			escape = false
+		}
 		switch {
 		// handling for single and double quotes
 		case ch == '\'' && !inSingleQuote && !inDoubleQuote:
-			if escape {
-				current.WriteRune(ch)
-				escape = false
-			} else {
-				inSingleQuote = true
-			}
+			inSingleQuote = true
 		case ch == '\'' && inSingleQuote:
-			if escape {
-				current.WriteRune(ch)
-				escape = false
-			} else {
-				inSingleQuote = false
-			}
-		case ch == '"' && !inDoubleQuote && !inSingleQuote:
-			if escape {
-				current.WriteRune(ch)
-				escape = false
-			} else {
-				inDoubleQuote = true
-			}
+			inSingleQuote = false
+		case ch == '"' && !inSingleQuote && !inDoubleQuote:
+			inDoubleQuote = true
 		case ch == '"' && inDoubleQuote:
-			if escape {
-				current.WriteRune(ch)
-				escape = false
-			} else {
-				inDoubleQuote = false
-			}
+			inDoubleQuote = false
 		case ch == ' ' && !inSingleQuote && !inDoubleQuote:
-			if current.Len() > 0 && !escape {
-				tokens = append(tokens, current.String())
-				current.Reset()
-			} else if current.Len() > 0 && escape {
-				current.WriteRune(ch)
-				escape = false
-			}
-		// handling for '\' when not in quotes
+			tokens = append(tokens, current.String())
+			current.Reset()
 		case ch == '\\' && !inDoubleQuote && !inSingleQuote:
-			if escape {
-				current.WriteRune(ch)
-				escape = false
-			} else {
-				escape = true
-			}
+			escape = true
 
 		default:
 			current.WriteRune(ch)
