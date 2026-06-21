@@ -23,7 +23,7 @@ func tokenize(command string) []string {
 			inSingleQuote = true
 		case ch == '\'' && inSingleQuote:
 			inSingleQuote = false
-		case ch == ' ' && !inSingleQuote:
+		case ch == ' ' && !inSingleQuote && !inDoubleQuote:
 			if current.Len() > 0 {
 				tokens = append(tokens, current.String())
 				current.Reset()
@@ -32,11 +32,6 @@ func tokenize(command string) []string {
 			inDoubleQuote = true
 		case ch == '"' && inDoubleQuote:
 			inDoubleQuote = false
-		case ch == ' ' && !inDoubleQuote:
-			if current.Len() > 0 {
-				tokens = append(tokens, current.String())
-				current.Reset()
-			}
 		default:
 			current.WriteRune(ch)
 		}
