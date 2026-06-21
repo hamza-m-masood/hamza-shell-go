@@ -37,7 +37,6 @@ func tokenize(command string) []string {
 			tokens = append(tokens, current.String())
 			current.Reset()
 		case ch == '\\':
-			fmt.Println("character:", ch, "escpaing!")
 			escape = true
 
 		default:
