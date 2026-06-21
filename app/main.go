@@ -17,12 +17,18 @@ func tokenize(command string) []string {
 	inSingleQuote := false
 	inDoubleQuote := false
 	escape := false
+	space := false
 
 	for _, ch := range command {
 		if escape {
 			current.WriteRune(ch)
 			escape = false
 			continue
+		}
+		if ch == ' ' && space && !inSingleQuote && !inDoubleQuote {
+			continue
+		} else {
+			space = false
 		}
 		switch {
 		// handling for single and double quotes
@@ -36,10 +42,13 @@ func tokenize(command string) []string {
 			inDoubleQuote = false
 		case ch == ' ' && !inSingleQuote && !inDoubleQuote:
 			tokens = append(tokens, current.String())
+			fmt.Println("found space!")
+			fmt.Println("token:", tokens)
+			fmt.Println("current:", current)
 			current.Reset()
+			space = true
 		case ch == '\\' && !inSingleQuote:
 			escape = true
-
 		default:
 			current.WriteRune(ch)
 		}
