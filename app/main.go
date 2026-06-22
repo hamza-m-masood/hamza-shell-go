@@ -222,6 +222,8 @@ func main() {
 			}
 			if redirect != "2>" {
 				fmt.Println(stdErrOutput.String())
+			} else {
+				fmt.Println(stdOutput.String())
 			}
 		} else {
 			output := processTokens(tokens)
