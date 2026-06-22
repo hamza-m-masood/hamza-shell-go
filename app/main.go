@@ -70,9 +70,8 @@ func processTokens(tokens []string) (string, error) {
 		for _, file := range files {
 			contentBytes, err := os.ReadFile(file)
 			if err != nil {
-				catErrorOutput := fmt.Sprintf("%v: nonexistent: No such file or directory", tokens[0])
-				catError := errors.New(catErrorOutput)
-				return "", catError
+				fmt.Printf("%v: nonexistent: No such file or directory\n", tokens[0])
+				continue
 			}
 			content = append(content, strings.TrimSpace(string(contentBytes)))
 		}
