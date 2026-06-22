@@ -70,7 +70,7 @@ func processTokens(tokens []string) []Output {
 	case "echo":
 		outputs = []Output{
 			{
-				Content:    fmt.Sprint(strings.Join(tokens[1:], " ")),
+				Content:    fmt.Sprint(strings.Join(tokens[1:], " ") + "\n"),
 				IsStdError: false,
 			},
 		}
@@ -80,31 +80,31 @@ func processTokens(tokens []string) []Output {
 		for _, file := range files {
 			contentBytes, err := os.ReadFile(file)
 			if err != nil {
-				outputs = append(outputs, Output{Content: fmt.Sprintf("%v: nonexistent: No such file or directory", tokens[0]), IsStdError: true})
+				outputs = append(outputs, Output{Content: fmt.Sprintf("%v: nonexistent: No such file or directory", tokens[0]) + "\n", IsStdError: true})
 				continue
 			}
-			outputs = append(outputs, Output{Content: strings.TrimSpace(string(contentBytes)), IsStdError: false})
+			outputs = append(outputs, Output{Content: strings.TrimSpace(string(contentBytes)) + "\n", IsStdError: false})
 		}
 		return outputs
 	case "pwd":
 		wd, err := os.Getwd()
 
 		if err != nil {
-			outputs = append(outputs, Output{Content: string(err.Error()), IsStdError: true})
+			outputs = append(outputs, Output{Content: string(err.Error()) + "\n", IsStdError: true})
 			return outputs
 		}
-		outputs = append(outputs, Output{Content: wd, IsStdError: true})
+		outputs = append(outputs, Output{Content: wd + "\n", IsStdError: true})
 		return outputs
 	case "type":
 		for i := 1; i < len(tokens); i++ {
 			if slices.Contains(builtin, tokens[i]) {
-				outputs = append(outputs, Output{Content: fmt.Sprintf("%v is a shell builtin", tokens[i]), IsStdError: false})
+				outputs = append(outputs, Output{Content: fmt.Sprintf("%v is a shell builtin", tokens[i]) + "\n", IsStdError: false})
 			} else {
 				path, err := exec.LookPath(tokens[i])
 				if err != nil {
-					outputs = append(outputs, Output{Content: fmt.Sprint(tokens[i] + ": not found"), IsStdError: true})
+					outputs = append(outputs, Output{Content: fmt.Sprint(tokens[i] + ": not found" + "\n"), IsStdError: true})
 				} else {
-					outputs = append(outputs, Output{Content: fmt.Sprintf("%v is %v", tokens[i], path), IsStdError: false})
+					outputs = append(outputs, Output{Content: fmt.Sprintf("%v is %v", tokens[i], path) + "\n", IsStdError: false})
 				}
 			}
 		}
@@ -114,7 +114,7 @@ func processTokens(tokens []string) []Output {
 		if tokens[1] == "~" {
 			homeDir, err := os.UserHomeDir()
 			if err != nil {
-				outputs = append(outputs, Output{Content: fmt.Sprintf("error geting home directory of user: %v", err), IsStdError: true})
+				outputs = append(outputs, Output{Content: fmt.Sprintf("error geting home directory of user: %v", err) + "\n", IsStdError: true})
 				return outputs
 			}
 			err = os.Chdir(homeDir)
@@ -123,10 +123,10 @@ func processTokens(tokens []string) []Output {
 		}
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
-				outputs = append(outputs, Output{Content: fmt.Sprintf("cd: %v: No such file or directory", tokens[1]), IsStdError: true})
+				outputs = append(outputs, Output{Content: fmt.Sprintf("cd: %v: No such file or directory", tokens[1]) + "\n", IsStdError: true})
 				return outputs
 			} else {
-				outputs = append(outputs, Output{Content: fmt.Sprintf("error changing directory: %v", err), IsStdError: true})
+				outputs = append(outputs, Output{Content: fmt.Sprintf("error changing directory: %v", err) + "\n", IsStdError: true})
 				return outputs
 			}
 		}
@@ -134,17 +134,17 @@ func processTokens(tokens []string) []Output {
 		_, err := exec.LookPath(tokens[0])
 		outputs := []Output{}
 		if err != nil {
-			outputs = append(outputs, Output{Content: fmt.Sprint(tokens[0] + ": not found"), IsStdError: true})
+			outputs = append(outputs, Output{Content: fmt.Sprint(tokens[0]+": not found") + "\n", IsStdError: true})
 			return outputs
 		} else {
 			cmd := exec.Command(tokens[0], tokens[1:]...)
 			cmd.Stdin = os.Stdin
 			output, err := cmd.Output()
 			if err != nil {
-				outputs = append(outputs, Output{Content: fmt.Sprintf("%v: nonexistent: No such file or directory", tokens[0]), IsStdError: true})
+				outputs = append(outputs, Output{Content: fmt.Sprintf("%v: nonexistent: No such file or directory", tokens[0]) + "\n", IsStdError: true})
 				return outputs
 			}
-			outputs = append(outputs, Output{Content: strings.TrimSpace(string(output)), IsStdError: false})
+			outputs = append(outputs, Output{Content: strings.TrimSpace(string(output)) + "\n", IsStdError: false})
 			return outputs
 		}
 	}
@@ -240,9 +240,6 @@ func main() {
 			output := processTokens(tokens)
 			for _, o := range output {
 				fmt.Print(o.Content)
-			}
-			if len(output) > 0 {
-				fmt.Println("")
 			}
 		}
 	}
