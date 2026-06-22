@@ -216,10 +216,16 @@ func main() {
 				_ = os.WriteFile(fileName, stdOutputB, 0644)
 			} else if redirect == "2>" {
 				_ = os.WriteFile(fileName, stdErrOutputB, 0644)
-			} else if redirect == ">>" {
-				f, _ := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+			} else if redirect == ">>" || redirect == "1>>" {
+				f, err := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+				if err != nil {
+					fmt.Println("failed to open file!")
+				}
 				defer f.Close()
-				f.WriteString(stdErrOutput.String())
+				_, err = f.WriteString(stdOutput.String())
+				if err != nil {
+					fmt.Println("failed to open file!")
+				}
 			}
 			if redirect != "2>" {
 				if len(stdErrOutput.String()) > 0 {
