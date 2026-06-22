@@ -80,11 +80,12 @@ func processTokens(tokens []string) []Output {
 		for _, file := range files {
 			contentBytes, err := os.ReadFile(file)
 			if err != nil {
-				outputs = append(outputs, Output{Content: fmt.Sprintf("%v: nonexistent: No such file or directory", tokens[0]) + "\n", IsStdError: true})
+				outputs = append(outputs, Output{Content: fmt.Sprintf("%v: nonexistent: No such file or directory", tokens[0]), IsStdError: true})
 				continue
 			}
-			outputs = append(outputs, Output{Content: strings.TrimSpace(string(contentBytes)) + "\n", IsStdError: false})
+			outputs = append(outputs, Output{Content: strings.TrimSpace(string(contentBytes)), IsStdError: false})
 		}
+		outputs = append(outputs, Output{Content: "\n", IsStdError: false})
 		return outputs
 	case "pwd":
 		wd, err := os.Getwd()
