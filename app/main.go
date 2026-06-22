@@ -220,7 +220,9 @@ func main() {
 			if err != nil {
 				fmt.Println("error writing to file:", err)
 			}
-			fmt.Println(stdErrOutput.String())
+			if redirect != "2>" {
+				fmt.Println(stdErrOutput.String())
+			}
 		} else {
 			output := processTokens(tokens)
 			for _, o := range output {
