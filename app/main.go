@@ -127,11 +127,6 @@ func processTokens(tokens []string) (string, error) {
 		} else {
 			cmd := exec.Command(tokens[0], tokens[1:]...)
 			cmd.Stdin = os.Stdin
-			// cmd.Stdout = os.Stdout
-			// if err != nil {
-			// 	return "", err
-			// }
-			// err = cmd.Run()
 			output, err := cmd.Output()
 			if err != nil {
 				defaultErrorOutput := fmt.Sprintf("couldn't run command: %v: %v", tokens[0], err)
@@ -190,11 +185,6 @@ func main() {
 
 			}
 			fileName := tokens[index+1:][0]
-			// check for existence
-			if _, err := os.Stat(fileName); err != nil {
-				fmt.Printf("%v: nonexistent: No such file or directory\n", tokens[0])
-				continue
-			}
 			b := []byte(output)
 			err = os.WriteFile(fileName, b, 0644)
 			if err != nil {
