@@ -113,11 +113,11 @@ func processTokens(tokens []string) (string, error) {
 		}
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
-				cdErrorOutput := fmt.Sprintf("cd: %v: No such file or directory\n", tokens[1])
+				cdErrorOutput := fmt.Sprintf("cd: %v: No such file or directory", tokens[1])
 				cdError := errors.New(cdErrorOutput)
 				return "", cdError
 			} else {
-				return fmt.Sprintf("error changing directory: %v\n", err), nil
+				return fmt.Sprintf("error changing directory: %v", err), nil
 			}
 		}
 	default:
@@ -176,7 +176,7 @@ func main() {
 			p := tokens[:index]
 			output, err := processTokens(p)
 			if err != nil {
-				fmt.Print(err)
+				fmt.Println(err)
 			}
 			//only one file on right side of ">" operator
 			if len(tokens[index+1:]) != 1 {
@@ -194,8 +194,9 @@ func main() {
 			output, err := processTokens(tokens)
 			if err != nil {
 				fmt.Println(err)
+			} else {
+				fmt.Println(output)
 			}
-			fmt.Println(output)
 		}
 
 	}
