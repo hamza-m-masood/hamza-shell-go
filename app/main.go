@@ -85,7 +85,6 @@ func processTokens(tokens []string) []Output {
 			}
 			outputs = append(outputs, Output{Content: strings.TrimSpace(string(contentBytes)), IsStdError: false})
 		}
-		outputs = append(outputs, Output{Content: "\n", IsStdError: false})
 		return outputs
 	case "pwd":
 		wd, err := os.Getwd()
