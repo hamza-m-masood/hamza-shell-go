@@ -229,8 +229,9 @@ func main() {
 		} else {
 			output := processTokens(tokens)
 			for _, o := range output {
-				fmt.Println(o.Content)
+				fmt.Print(o.Content)
 			}
+			fmt.Println("")
 		}
 	}
 
