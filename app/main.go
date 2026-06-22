@@ -70,7 +70,9 @@ func processTokens(tokens []string) (string, error) {
 		for _, file := range files {
 			contentBytes, err := os.ReadFile(file)
 			if err != nil {
-				fmt.Printf("error reading file: %v: %v\n", file, err)
+				catErrorOutput := fmt.Sprintf("error reading file: %v: %v\n", file, err)
+				catError := errors.New(catErrorOutput)
+				return "", catError
 			}
 			content = append(content, strings.TrimSpace(string(contentBytes)))
 		}
@@ -124,14 +126,19 @@ func processTokens(tokens []string) (string, error) {
 			return fmt.Sprintln(tokens[0] + ": not found"), nil
 		} else {
 			cmd := exec.Command(tokens[0], tokens[1:]...)
-			// cmd.Stdin = os.Stdin
-			cmd.Stdout = os.Stdout
-			err := cmd.Run()
+			cmd.Stdin = os.Stdin
+			// cmd.Stdout = os.Stdout
+			// if err != nil {
+			// 	return "", err
+			// }
+			// err = cmd.Run()
+			output, err := cmd.Output()
 			if err != nil {
 				defaultErrorOutput := fmt.Sprintf("couldn't run command: %v: %v", tokens[0], err)
 				defaultError := errors.New(defaultErrorOutput)
 				return "", defaultError
 			}
+			return string(output), nil
 		}
 	}
 	return "", nil
