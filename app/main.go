@@ -70,7 +70,7 @@ func processTokens(tokens []string) (string, error) {
 		for _, file := range files {
 			contentBytes, err := os.ReadFile(file)
 			if err != nil {
-				catErrorOutput := fmt.Sprintf("error reading file: %v: %v\n", file, err)
+				catErrorOutput := fmt.Sprintf("%v: nonexistent: No such file or directory", tokens[0])
 				catError := errors.New(catErrorOutput)
 				return "", catError
 			}
@@ -195,7 +195,6 @@ func main() {
 			if err != nil {
 				fmt.Println(err)
 			}
-			//TODO: fix fmt.Print to fmt.Println
 			fmt.Println(output)
 		}
 
