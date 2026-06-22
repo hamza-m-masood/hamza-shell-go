@@ -11,6 +11,11 @@ import (
 	"strings"
 )
 
+type Output struct {
+	Content    string
+	IsStdError bool
+}
+
 func tokenize(command string) []string {
 	var tokens []string
 	var current strings.Builder
@@ -58,53 +63,59 @@ func tokenize(command string) []string {
 	return tokens
 }
 
-func processTokens(tokens []string) (string, error) {
+func processTokens(tokens []string) []Output {
 	builtin := []string{"exit", "echo", "type", "pwd", "cd"}
+	var outputs []Output
 	switch tokens[0] {
 	case "echo":
-		echoOutput := fmt.Sprint(strings.Join(tokens[1:], " "))
-		return echoOutput, nil
+		outputs = []Output{
+			{
+				Content:    fmt.Sprint(strings.Join(tokens[1:], " ")),
+				IsStdError: false,
+			},
+		}
+		return outputs
 	case "cat":
 		files := tokens[1:]
-		content := []string{}
 		for _, file := range files {
 			contentBytes, err := os.ReadFile(file)
 			if err != nil {
-				fmt.Printf("%v: nonexistent: No such file or directory\n", tokens[0])
+				outputs = append(outputs, Output{Content: fmt.Sprintf("%v: nonexistent: No such file or directory", tokens[0]), IsStdError: true})
 				continue
 			}
-			content = append(content, strings.TrimSpace(string(contentBytes)))
+			outputs = append(outputs, Output{Content: strings.TrimSpace(string(contentBytes)), IsStdError: false})
 		}
-		return strings.Join(content, ""), nil
+		return outputs
 	case "pwd":
 		wd, err := os.Getwd()
+
 		if err != nil {
-			return "", err
+			outputs = append(outputs, Output{Content: string(err.Error()), IsStdError: true})
+			return outputs
 		}
-		return wd, nil
+		outputs = append(outputs, Output{Content: wd, IsStdError: true})
+		return outputs
 	case "type":
 		for i := 1; i < len(tokens); i++ {
 			if slices.Contains(builtin, tokens[i]) {
-				return fmt.Sprintf("%v is a shell builtin", tokens[i]), nil
+				outputs = append(outputs, Output{Content: fmt.Sprintf("%v is a shell builtin", tokens[i]), IsStdError: false})
 			} else {
 				path, err := exec.LookPath(tokens[i])
 				if err != nil {
-					typeErrorOutput := fmt.Sprint(tokens[i] + ": not found")
-					typeError := errors.New(typeErrorOutput)
-					return "", typeError
+					outputs = append(outputs, Output{Content: fmt.Sprint(tokens[i] + ": not found"), IsStdError: true})
 				} else {
-					return fmt.Sprintf("%v is %v", tokens[i], path), nil
+					outputs = append(outputs, Output{Content: fmt.Sprintf("%v is %v", tokens[i], path), IsStdError: false})
 				}
 			}
 		}
+		return outputs
 	case "cd":
 		var err error
 		if tokens[1] == "~" {
 			homeDir, err := os.UserHomeDir()
 			if err != nil {
-				cdErrorOutput := fmt.Sprintf("error geting home directory of user: %v", err)
-				cdError := errors.New(cdErrorOutput)
-				return "", cdError
+				outputs = append(outputs, Output{Content: fmt.Sprintf("error geting home directory of user: %v", err), IsStdError: true})
+				return outputs
 			}
 			err = os.Chdir(homeDir)
 		} else {
@@ -112,30 +123,49 @@ func processTokens(tokens []string) (string, error) {
 		}
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {
-				cdErrorOutput := fmt.Sprintf("cd: %v: No such file or directory", tokens[1])
-				cdError := errors.New(cdErrorOutput)
-				return "", cdError
+				outputs = append(outputs, Output{Content: fmt.Sprintf("cd: %v: No such file or directory", tokens[1]), IsStdError: true})
+				return outputs
 			} else {
-				return fmt.Sprintf("error changing directory: %v", err), nil
+				outputs = append(outputs, Output{Content: fmt.Sprintf("error changing directory: %v", err), IsStdError: true})
+				return outputs
 			}
 		}
 	default:
 		_, err := exec.LookPath(tokens[0])
+		outputs := []Output{}
 		if err != nil {
-			return fmt.Sprint(tokens[0] + ": not found"), nil
+			outputs = append(outputs, Output{Content: fmt.Sprint(tokens[0] + ": not found"), IsStdError: true})
+			return outputs
 		} else {
 			cmd := exec.Command(tokens[0], tokens[1:]...)
 			cmd.Stdin = os.Stdin
 			output, err := cmd.Output()
 			if err != nil {
-				defaultErrorOutput := fmt.Sprintf("couldn't run command: %v: %v", tokens[0], err)
-				defaultError := errors.New(defaultErrorOutput)
-				return "", defaultError
+				outputs = append(outputs, Output{Content: fmt.Sprintf("couldn't run command: %v: %v", tokens[0], err), IsStdError: true})
+				return outputs
 			}
-			return strings.TrimSpace(string(output)), nil
+			outputs = append(outputs, Output{Content: strings.TrimSpace(string(output)), IsStdError: false})
+			return outputs
 		}
 	}
-	return "", nil
+	return nil
+}
+
+// find the first occurence of the index and value of any element in r that is present in s
+func containsAny(s, r []string) (int, string) {
+	var element string
+	var index int
+	for _, el := range r {
+		if slices.Contains(s, el) {
+			element = el
+		}
+	}
+	if len(element) > 0 {
+		index = slices.Index(s, element)
+		return index, element
+	}
+
+	return 0, ""
 }
 
 func main() {
@@ -160,46 +190,43 @@ func main() {
 			}
 			return
 		}
-		if slices.Contains(tokens, ">") || slices.Contains(tokens, "1>") {
-			var index int
-			if slices.Contains(tokens, ">") {
-				index = slices.Index(tokens, ">")
-			} else if slices.Contains(tokens, "1>") {
-				index = slices.Index(tokens, "1>")
-			}
-
-			if index == -1 {
-				fmt.Println("Could not redirect output")
-			}
-
+		redirects := []string{">", "1>", "2>"}
+		index, redirect := containsAny(tokens, redirects)
+		if len(redirect) > 0 {
 			p := tokens[:index]
-			output, err := processTokens(p)
-			if err != nil {
-				fmt.Println(err)
-			}
+			output := processTokens(p)
 			//only one file on right side of ">" operator
 			if len(tokens[index+1:]) != 1 {
 				fmt.Println("Please enter only one file name")
 				continue
-
 			}
 			fileName := tokens[index+1:][0]
-			b := []byte(output)
-			err = os.WriteFile(fileName, b, 0644)
+			stdOutput := strings.Builder{}
+			stdErrOutput := strings.Builder{}
+			for _, o := range output {
+				if o.IsStdError {
+					stdErrOutput.WriteString(o.Content)
+					continue
+				}
+				stdOutput.WriteString(o.Content)
+			}
+			stdOutputB := []byte(stdOutput.String())
+			stdErrOutputB := []byte(stdErrOutput.String())
+			if redirect == ">" || redirect == "1>" {
+				err = os.WriteFile(fileName, stdOutputB, 0644)
+			} else if redirect == "2>" {
+				err = os.WriteFile(fileName, stdErrOutputB, 0644)
+			}
 			if err != nil {
 				fmt.Println("error writing to file:", err)
 			}
+			fmt.Println(stdErrOutput.String())
 		} else {
-			output, err := processTokens(tokens)
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				if len(output) > 0 {
-					fmt.Println(output)
-				}
+			output := processTokens(tokens)
+			for _, o := range output {
+				fmt.Println(o.Content)
 			}
 		}
-
 	}
 
 }
