@@ -231,7 +231,9 @@ func main() {
 			for _, o := range output {
 				fmt.Print(o.Content)
 			}
-			fmt.Println("")
+			if len(output) > 0 {
+				fmt.Println("")
+			}
 		}
 	}
 
