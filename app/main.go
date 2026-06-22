@@ -217,23 +217,17 @@ func main() {
 			} else if redirect == "2>" {
 				_ = os.WriteFile(fileName, stdErrOutputB, 0644)
 			} else if redirect == ">>" || redirect == "1>>" {
-				f, err := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-				if err != nil {
-					fmt.Println("failed to open file!")
-				}
+				f, _ := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 				defer f.Close()
-				_, err = f.WriteString(stdOutput.String())
-				if err != nil {
-					fmt.Println("failed to open file!")
-				}
+				f.WriteString(stdOutput.String())
 			}
 			if redirect != "2>" {
 				if len(stdErrOutput.String()) > 0 {
-					fmt.Println(stdErrOutput.String())
+					fmt.Print(stdErrOutput.String())
 				}
 			} else {
 				if len(stdOutput.String()) > 0 {
-					fmt.Println(stdOutput.String())
+					fmt.Print(stdOutput.String())
 				}
 			}
 		} else {
