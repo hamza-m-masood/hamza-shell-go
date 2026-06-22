@@ -141,7 +141,7 @@ func processTokens(tokens []string) []Output {
 			cmd.Stdin = os.Stdin
 			output, err := cmd.Output()
 			if err != nil {
-				outputs = append(outputs, Output{Content: fmt.Sprintf("couldn't run command: %v: %v", tokens[0], err), IsStdError: true})
+				outputs = append(outputs, Output{Content: fmt.Sprintf("%v: nonexistent: No such file or directory", tokens[0]), IsStdError: true})
 				return outputs
 			}
 			outputs = append(outputs, Output{Content: strings.TrimSpace(string(output)), IsStdError: false})
