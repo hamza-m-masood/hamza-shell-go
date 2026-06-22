@@ -1,0 +1,6 @@
+README.md
+app
+codecrafters.yml
+go.mod
+go.sum
+your_program.sh

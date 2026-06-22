@@ -62,7 +62,7 @@ func processTokens(tokens []string) (string, error) {
 	builtin := []string{"exit", "echo", "type", "pwd", "cd"}
 	switch tokens[0] {
 	case "echo":
-		echoOutput := fmt.Sprintln(strings.Join(tokens[1:], " "))
+		echoOutput := fmt.Sprint(strings.Join(tokens[1:], " "))
 		return echoOutput, nil
 	case "cat":
 		files := tokens[1:]
@@ -86,7 +86,7 @@ func processTokens(tokens []string) (string, error) {
 	case "type":
 		for i := 1; i < len(tokens); i++ {
 			if slices.Contains(builtin, tokens[i]) {
-				return fmt.Sprintf("%v is a shell builtin\n", tokens[i]), nil
+				return fmt.Sprintf("%v is a shell builtin", tokens[i]), nil
 			} else {
 				path, err := exec.LookPath(tokens[i])
 				if err != nil {
@@ -94,7 +94,7 @@ func processTokens(tokens []string) (string, error) {
 					typeError := errors.New(typeErrorOutput)
 					return "", typeError
 				} else {
-					return fmt.Sprintf("%v is %v\n", tokens[i], path), nil
+					return fmt.Sprintf("%v is %v", tokens[i], path), nil
 				}
 			}
 		}
@@ -123,7 +123,7 @@ func processTokens(tokens []string) (string, error) {
 	default:
 		_, err := exec.LookPath(tokens[0])
 		if err != nil {
-			return fmt.Sprintln(tokens[0] + ": not found"), nil
+			return fmt.Sprint(tokens[0] + ": not found"), nil
 		} else {
 			cmd := exec.Command(tokens[0], tokens[1:]...)
 			cmd.Stdin = os.Stdin
@@ -133,7 +133,7 @@ func processTokens(tokens []string) (string, error) {
 				defaultError := errors.New(defaultErrorOutput)
 				return "", defaultError
 			}
-			return string(output), nil
+			return strings.TrimSpace(string(output)), nil
 		}
 	}
 	return "", nil
@@ -196,7 +196,7 @@ func main() {
 				fmt.Println(err)
 			}
 			//TODO: fix fmt.Print to fmt.Println
-			fmt.Print(output)
+			fmt.Println(output)
 		}
 
 	}
