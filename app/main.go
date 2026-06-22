@@ -213,12 +213,9 @@ func main() {
 			stdOutputB := []byte(stdOutput.String())
 			stdErrOutputB := []byte(stdErrOutput.String())
 			if redirect == ">" || redirect == "1>" {
-				err = os.WriteFile(fileName, stdOutputB, 0644)
+				_ = os.WriteFile(fileName, stdOutputB, 0644)
 			} else if redirect == "2>" {
-				err = os.WriteFile(fileName, stdErrOutputB, 0644)
-			}
-			if err != nil {
-				fmt.Println("error writing to file:", err)
+				_ = os.WriteFile(fileName, stdErrOutputB, 0644)
 			}
 			if redirect != "2>" {
 				fmt.Println(stdErrOutput.String())
