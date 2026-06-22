@@ -218,9 +218,13 @@ func main() {
 				_ = os.WriteFile(fileName, stdErrOutputB, 0644)
 			}
 			if redirect != "2>" {
-				fmt.Println(stdErrOutput.String())
+				if len(stdErrOutput.String()) > 0 {
+					fmt.Println(stdErrOutput.String())
+				}
 			} else {
-				fmt.Println(stdOutput.String())
+				if len(stdOutput.String()) > 0 {
+					fmt.Println(stdOutput.String())
+				}
 			}
 		} else {
 			output := processTokens(tokens)
