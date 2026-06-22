@@ -194,7 +194,9 @@ func main() {
 			if err != nil {
 				fmt.Println(err)
 			} else {
-				fmt.Println(output)
+				if len(output) > 0 {
+					fmt.Println(output)
+				}
 			}
 		}
 
