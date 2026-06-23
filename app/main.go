@@ -225,7 +225,7 @@ func main() {
 				defer f.Close()
 				f.WriteString(stdErrOutput.String())
 			}
-			if redirect != "2>" {
+			if redirect != "2>" || redirect != "2>>" {
 				if len(stdErrOutput.String()) > 0 {
 					fmt.Print(stdErrOutput.String())
 				}
