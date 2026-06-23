@@ -80,7 +80,7 @@ func processTokens(tokens []string) []Output {
 		for _, file := range files {
 			contentBytes, err := os.ReadFile(file)
 			if err != nil {
-				outputs = append(outputs, Output{Content: fmt.Sprintf("%v: nonexistent: No such file or directory", tokens[0]), IsStdError: true})
+				outputs = append(outputs, Output{Content: fmt.Sprintf("%v: nonexistent: No such file or directory", tokens[0]) + "\n", IsStdError: true})
 				continue
 			}
 			outputs = append(outputs, Output{Content: string(contentBytes), IsStdError: false})
