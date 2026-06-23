@@ -83,7 +83,7 @@ func processTokens(tokens []string) []Output {
 				outputs = append(outputs, Output{Content: fmt.Sprintf("%v: nonexistent: No such file or directory", tokens[0]), IsStdError: true})
 				continue
 			}
-			outputs = append(outputs, Output{Content: strings.TrimSpace(string(contentBytes)), IsStdError: false})
+			outputs = append(outputs, Output{Content: string(contentBytes), IsStdError: false})
 		}
 		return outputs
 	case "pwd":
