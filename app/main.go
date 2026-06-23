@@ -190,7 +190,7 @@ func main() {
 			}
 			return
 		}
-		redirects := []string{">", "1>", "2>", ">>", "1>>"}
+		redirects := []string{">", "1>", "2>", ">>", "1>>", "2>>"}
 		index, redirect := containsAny(tokens, redirects)
 		if len(redirect) > 0 {
 			p := tokens[:index]
@@ -220,6 +220,10 @@ func main() {
 				f, _ := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 				defer f.Close()
 				f.WriteString(stdOutput.String())
+			} else if redirect == "2>>" {
+				f, _ := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+				defer f.Close()
+				f.WriteString(stdErrOutput.String())
 			}
 			if redirect != "2>" {
 				if len(stdErrOutput.String()) > 0 {
