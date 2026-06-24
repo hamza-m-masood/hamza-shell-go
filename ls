@@ -1,9 +1,0 @@
-README.md
-app
-bee.md
-codecrafters.yml
-fmt.md
-go.mod
-go.sum
-moo
-your_program.sh

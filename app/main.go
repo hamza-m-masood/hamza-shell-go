@@ -1,14 +1,16 @@
 package main
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"slices"
 	"strings"
+
+	"github.com/ergochat/readline"
 )
 
 type Output struct {
@@ -168,21 +170,39 @@ func containsAny(s, r []string) (int, string) {
 	return 0, ""
 }
 
+var completer = readline.NewPrefixCompleter(
+	readline.PcItem("echo"),
+	readline.PcItem("exit"),
+)
+
 func main() {
-	reader := bufio.NewReader(os.Stdin)
+	l, err := readline.NewFromConfig(&readline.Config{
+		Prompt:          "$ ",
+		HistoryFile:     "/tmp/readline.tmp",
+		InterruptPrompt: "^C",
+		EOFPrompt:       "exit",
+		AutoComplete:    completer,
+
+		HistorySearchFold: true,
+	})
+	if err != nil {
+		panic(err)
+	}
+	defer l.Close()
+	l.CaptureExitSignal()
+	log.SetOutput(l.Stderr())
 	for {
-		fmt.Print("$ ")
-		command, err := reader.ReadString('\n')
-		if err != nil {
-			if err == io.EOF {
-				fmt.Println()
+		line, err := l.Readline()
+		if err == readline.ErrInterrupt {
+			if len(line) == 0 {
 				break
+			} else {
+				continue
 			}
-			fmt.Fprintln(os.Stderr, "Error reading input", err)
-			os.Exit(1)
+		} else if err == io.EOF {
+			break
 		}
-		command = strings.TrimSpace(command)
-		tokens := tokenize(command)
+		tokens := tokenize(line)
 		if tokens[0] == "exit" {
 			if len(tokens) > 1 {
 				fmt.Fprintln(os.Stderr, "exit: too many arguments")
