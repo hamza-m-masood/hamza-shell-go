@@ -1,14 +1,16 @@
 package main
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"slices"
 	"strings"
+
+	"github.com/chzyer/readline"
 )
 
 type Output struct {
@@ -169,20 +171,46 @@ func containsAny(s, r []string) (int, string) {
 }
 
 func main() {
-	reader := bufio.NewReader(os.Stdin)
+	l, err := readline.NewEx(&readline.Config{
+		Prompt:          "$ ",
+		HistoryFile:     "/tmp/readline.tmp",
+		InterruptPrompt: "^C",
+		EOFPrompt:       "exit",
+
+		HistorySearchFold: true,
+	})
+	if err != nil {
+		panic(err)
+	}
+	defer l.Close()
+	l.CaptureExitSignal()
+	// reader := bufio.NewReader(os.Stdin)
+	log.SetOutput(l.Stderr())
 	for {
-		fmt.Print("$ ")
-		command, err := reader.ReadString('\n')
-		if err != nil {
-			if err == io.EOF {
-				fmt.Println()
+		line, err := l.Readline()
+		if err == readline.ErrInterrupt {
+			if len(line) == 0 {
 				break
+			} else {
+				continue
 			}
-			fmt.Fprintln(os.Stderr, "Error reading input", err)
-			os.Exit(1)
+		} else if err == io.EOF {
+			break
 		}
-		command = strings.TrimSpace(command)
-		tokens := tokenize(command)
+
+		line = strings.TrimSpace(line)
+		// fmt.Print("$ ")
+		// command, err := reader.ReadString('\n')
+		// if err != nil {
+		// 	if err == io.EOF {
+		// 		fmt.Println()
+		// 		break
+		// 	}
+		// 	fmt.Fprintln(os.Stderr, "Error reading input", err)
+		// 	os.Exit(1)
+		// }
+		// command = strings.TrimSpace(command)
+		tokens := tokenize(line)
 		if tokens[0] == "exit" {
 			if len(tokens) > 1 {
 				fmt.Fprintln(os.Stderr, "exit: too many arguments")
