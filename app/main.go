@@ -170,12 +170,18 @@ func containsAny(s, r []string) (int, string) {
 	return 0, ""
 }
 
+var completer = readline.NewPrefixCompleter(
+	readline.PcItem("echo"),
+	readline.PcItem("exit"),
+)
+
 func main() {
 	l, err := readline.NewEx(&readline.Config{
 		Prompt:          "$ ",
 		HistoryFile:     "/tmp/readline.tmp",
 		InterruptPrompt: "^C",
 		EOFPrompt:       "exit",
+		AutoComplete:    completer,
 
 		HistorySearchFold: true,
 	})
@@ -199,17 +205,6 @@ func main() {
 		}
 
 		line = strings.TrimSpace(line)
-		// fmt.Print("$ ")
-		// command, err := reader.ReadString('\n')
-		// if err != nil {
-		// 	if err == io.EOF {
-		// 		fmt.Println()
-		// 		break
-		// 	}
-		// 	fmt.Fprintln(os.Stderr, "Error reading input", err)
-		// 	os.Exit(1)
-		// }
-		// command = strings.TrimSpace(command)
 		tokens := tokenize(line)
 		if tokens[0] == "exit" {
 			if len(tokens) > 1 {
