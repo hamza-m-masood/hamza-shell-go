@@ -175,6 +175,17 @@ var completer = readline.NewPrefixCompleter(
 	readline.PcItem("exit"),
 )
 
+type CustomCompleter struct {
+	*readline.PrefixCompleter
+}
+
+func (p *CustomCompleter) Do(line []rune, pos int) (newLine [][]rune, offset int) {
+	newLine, offset = p.PrefixCompleter.Do(line, pos)
+	if len(newLine) == 0 {
+		fmt.Print("\a")
+	}
+	return newLine, offset
+}
 func main() {
 	l, err := readline.NewEx(&readline.Config{
 		Prompt:          "$ ",
