@@ -170,10 +170,13 @@ func containsAny(s, r []string) (int, string) {
 	return 0, ""
 }
 
-var completer = readline.NewPrefixCompleter(
-	readline.PcItem("echo"),
-	readline.PcItem("exit"),
-)
+var completer = &CustomCompleter{
+
+	readline.NewPrefixCompleter(
+		readline.PcItem("echo"),
+		readline.PcItem("exit"),
+	),
+}
 
 type CustomCompleter struct {
 	*readline.PrefixCompleter
