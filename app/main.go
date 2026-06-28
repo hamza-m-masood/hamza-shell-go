@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"os"
 	"os/exec"
@@ -170,8 +171,31 @@ func containsAny(s, r []string) (int, string) {
 	return 0, ""
 }
 
-var completer = &CustomCompleter{
+func getExecutablesFromPath() ([]string, error) {
+	pathEnv := os.Getenv("PATH")
+	path := strings.Split(pathEnv, ":")
+	executables := []string{}
+	for _, d := range path {
+		filePaths, err := os.ReadDir(d)
+		if err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				continue
+			}
+		}
+		for _, fPath := range filePaths {
+			fInfo, err := fPath.Info()
+			if err != nil {
+				return nil, err
+			}
+			if fInfo.Mode().Perm()&0111 != 0 {
+				executables = append(executables, fInfo.Name())
+			}
+		}
+	}
+	return executables, nil
+}
 
+var completer = &CustomCompleter{
 	readline.NewPrefixCompleter(
 		readline.PcItem("echo"),
 		readline.PcItem("exit"),
@@ -184,6 +208,13 @@ type CustomCompleter struct {
 
 func (p *CustomCompleter) Do(line []rune, pos int) (newLine [][]rune, offset int) {
 	newLine, offset = p.PrefixCompleter.Do(line, pos)
+	execFiles, _ := getExecutablesFromPath()
+	for _, execFile := range execFiles {
+		if strings.HasPrefix(execFile, string(line)) {
+			l, _ := strings.CutPrefix(execFile, string(line))
+			newLine = append(newLine, []rune(l))
+		}
+	}
 	if len(newLine) == 0 {
 		fmt.Print("\a")
 	}
